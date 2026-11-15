@@ -253,24 +253,19 @@ html.dark .bg-rose-50, html.dark .bg-rose-100 { background-color: #3d2428 !impor
     margin: 0.75rem !important;
   }
 
-  /* Floating primary add button for thumb reach */
-  .fab-add {
-    display: flex !important;
-  }
-
   /* Stats: tighter */
   #statPaidRevenue {
     font-size: 1.35rem !important;
   }
 }
 
-/* Floating action button (mobile only) */
+/* Floating action button — shown only when Tailwind `sm:hidden` allows it (phones) */
 .fab-add {
-  display: none;
   position: fixed;
   right: 1rem;
   bottom: 1.15rem;
   z-index: 35;
+  display: flex;
   align-items: center;
   gap: 0.4rem;
   padding: 0.85rem 1.15rem;
@@ -281,6 +276,7 @@ html.dark .bg-rose-50, html.dark .bg-rose-100 { background-color: #3d2428 !impor
   font-size: 0.875rem;
   box-shadow: 0 8px 24px -6px rgba(83, 62, 194, 0.55), 0 4px 0 0 #533EC2;
   border: none;
+  cursor: pointer;
 }
 .fab-add:active {
   transform: translateY(2px);

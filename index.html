@@ -969,8 +969,8 @@
   <!-- Toast Notification Container -->
   <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
-  <!-- Mobile floating Add button -->
-  <button type="button" onclick="openOrderModal()" class="fab-add" title="Add new order">
+  <!-- Mobile-only floating Add button (hidden from sm breakpoint up) -->
+  <button type="button" onclick="openOrderModal()" class="fab-add sm:hidden" title="Add new order">
     <i data-lucide="plus" class="w-5 h-5"></i>
     <span>Add Entry</span>
   </button>
