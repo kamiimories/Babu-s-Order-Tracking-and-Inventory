@@ -134,22 +134,24 @@
             class="btn-trendy inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold bg-white text-slate-700 border border-slate-200 shadow-tactile hover:bg-cream-100"
             title="Undo last change">
             <i data-lucide="undo-2" class="w-4 h-4 text-lavender-600"></i>
-            <span>Undo</span>
+            <span class="toolbar-label">Undo</span>
             <span id="undoCountBadge" class="hidden text-[11px] px-1.5 py-0.2 rounded-md bg-lavender-100 text-lavender-700 font-extrabold">0</span>
           </button>
 
           <!-- Open CSV Button -->
           <button onclick="triggerCsvUpload()"
-            class="btn-trendy inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold bg-white text-slate-700 border border-slate-200 shadow-tactile hover:bg-cream-100">
+            class="btn-trendy inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold bg-white text-slate-700 border border-slate-200 shadow-tactile hover:bg-cream-100"
+            title="Open CSV">
             <i data-lucide="folder-open" class="w-4 h-4 text-peach-500"></i>
-            <span>Open CSV</span>
+            <span class="toolbar-label">Open CSV</span>
           </button>
 
           <!-- Export CSV Button -->
           <button onclick="exportToCSV()"
-            class="btn-trendy inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold bg-sage-100 text-sage-700 border border-sage-200 shadow-tactile hover:bg-sage-200/70">
+            class="btn-trendy inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold bg-sage-100 text-sage-700 border border-sage-200 shadow-tactile hover:bg-sage-200/70"
+            title="Export CSV">
             <i data-lucide="download" class="w-4 h-4 text-sage-600"></i>
-            <span>Export CSV</span>
+            <span class="toolbar-label">Export CSV</span>
           </button>
 
           <!-- Inventory Button -->
@@ -157,7 +159,7 @@
             class="btn-trendy inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs sm:text-sm font-bold bg-white text-slate-700 border border-slate-200 shadow-tactile hover:bg-cream-100"
             title="Manage babu's inventory (items, stock & prices)">
             <i data-lucide="package" class="w-4 h-4 text-lavender-600"></i>
-            <span>Inventory</span>
+            <span class="toolbar-label">Inventory</span>
             <span id="inventoryCountBadge" class="text-[11px] px-1.5 py-0.2 rounded-md bg-lavender-100 text-lavender-700 font-extrabold">0</span>
           </button>
 
@@ -166,12 +168,12 @@
             class="btn-trendy inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs sm:text-sm font-bold bg-white text-slate-700 border border-slate-200 shadow-tactile hover:bg-cream-100"
             title="Toggle dark mode">
             <i data-lucide="moon" class="w-4 h-4 text-lavender-600" id="darkModeIcon"></i>
-            <span id="darkModeLabel">Dark</span>
+            <span class="toolbar-label" id="darkModeLabel">Dark</span>
           </button>
 
-          <!-- Primary + Add Entry Button -->
+          <!-- Primary + Add Entry Button (desktop / tablet) -->
           <button onclick="openOrderModal()"
-            class="btn-trendy inline-flex items-center gap-1.5 px-4 sm:px-5 py-2 rounded-xl text-xs sm:text-sm font-extrabold bg-lavender-600 text-white shadow-tactile-primary hover:bg-lavender-500">
+            class="btn-trendy hidden sm:inline-flex items-center gap-1.5 px-4 sm:px-5 py-2 rounded-xl text-xs sm:text-sm font-extrabold bg-lavender-600 text-white shadow-tactile-primary hover:bg-lavender-500">
             <i data-lucide="plus-circle" class="w-4 h-4"></i>
             <span>+ Add Entry</span>
           </button>
@@ -244,7 +246,7 @@
     <section class="glass-card rounded-2xl p-4 shadow-soft flex flex-col md:flex-row md:items-center justify-between gap-4">
 
       <!-- 3 Workflow Stage Tabs -->
-      <div class="flex flex-wrap items-center gap-2 bg-cream-100 p-1.5 rounded-xl border border-cream-200">
+      <div class="tabs-scroll flex flex-wrap items-center gap-2 bg-cream-100 p-1.5 rounded-xl border border-cream-200">
         <button onclick="switchTab('ongoing')" id="tab-ongoing"
           class="tab-btn btn-trendy inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all bg-white text-lavender-600 shadow-sm">
           <i data-lucide="brush" class="w-4 h-4"></i>
@@ -296,7 +298,7 @@
     <!-- ===================================================================== -->
     <!-- TABLE 1: ONGOING ORDERS                                               -->
     <!-- ===================================================================== -->
-    <section id="section-ongoing" class="glass-card rounded-3xl shadow-soft overflow-hidden border border-lavender-200/80">
+    <section id="section-ongoing" class="table-mobile-cards glass-card rounded-3xl shadow-soft overflow-hidden border border-lavender-200/80">
       <div class="px-6 py-4 bg-gradient-to-r from-lavender-100/80 via-white to-peach-100/50 border-b border-lavender-200/60 flex flex-wrap items-center justify-between gap-2">
         <div class="flex items-center gap-2.5">
           <span class="w-3 h-3 rounded-full bg-lavender-500 animate-pulse"></span>
@@ -355,7 +357,7 @@
     <!-- ===================================================================== -->
     <!-- TABLE 2: SHIPPING ORDERS                                              -->
     <!-- ===================================================================== -->
-    <section id="section-shipping" class="hidden glass-card rounded-3xl shadow-soft overflow-hidden border border-amber-200/80">
+    <section id="section-shipping" class="table-mobile-cards hidden glass-card rounded-3xl shadow-soft overflow-hidden border border-amber-200/80">
       <div class="px-6 py-4 bg-gradient-to-r from-amber-100/70 via-white to-peach-100/50 border-b border-amber-200/60 flex flex-wrap items-center justify-between gap-2">
         <div class="flex items-center gap-2.5">
           <span class="w-3 h-3 rounded-full bg-amber-500"></span>
@@ -397,7 +399,7 @@
     <!-- ===================================================================== -->
     <!-- TABLE 3: COMPLETED ORDERS                                             -->
     <!-- ===================================================================== -->
-    <section id="section-completed" class="hidden glass-card rounded-3xl shadow-soft overflow-hidden border border-sage-200/80">
+    <section id="section-completed" class="table-mobile-cards hidden glass-card rounded-3xl shadow-soft overflow-hidden border border-sage-200/80">
       <div class="px-6 py-4 bg-gradient-to-r from-sage-100/80 via-white to-cream-100 border-b border-sage-200/70 flex flex-wrap items-center justify-between gap-2">
         <div class="flex items-center gap-2.5">
           <span class="w-3 h-3 rounded-full bg-sage-600"></span>
@@ -966,6 +968,12 @@
 
   <!-- Toast Notification Container -->
   <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- Mobile floating Add button -->
+  <button type="button" onclick="openOrderModal()" class="fab-add" title="Add new order">
+    <i data-lucide="plus" class="w-5 h-5"></i>
+    <span>Add Entry</span>
+  </button>
 
   <!-- ===================================================================== -->
   <!-- APPLICATION LOGIC                                                     -->

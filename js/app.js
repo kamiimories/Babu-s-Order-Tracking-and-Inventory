@@ -403,19 +403,19 @@
         emptyOngoing.classList.add('hidden');
         tbodyOngoing.innerHTML = ongoingList.map(order => `
           <tr class="hover:bg-lavender-50/50 transition-colors align-top">
-            <td class="py-4 px-4 whitespace-nowrap">
+            <td class="py-4 px-4 whitespace-nowrap" data-label="Order #">
               <span class="inline-flex items-center px-2.5 py-1 rounded-lg bg-lavender-100 text-lavender-700 font-mono font-extrabold text-xs border border-lavender-200">
                 #${escapeHTML(order.orderNumber)}
               </span>
             </td>
-            <td class="py-4 px-4 min-w-[180px]">
+            <td class="py-4 px-4 min-w-[180px]" data-label="Client">
               <p class="font-bold text-slate-900">${escapeHTML(order.fullName)}</p>
-              <div class="flex flex-wrap gap-1 mt-1.5">
+              <div class="flex flex-wrap gap-1 mt-1.5 justify-end sm:justify-start">
                 ${renderSocMedBadges(order.socmeds)}
               </div>
             </td>
-            <td class="py-4 px-4 min-w-[200px] max-w-xs">
-              <p class="text-xs font-semibold text-slate-700 flex items-center gap-1">
+            <td class="py-4 px-4 min-w-[200px] max-w-xs" data-label="Contact">
+              <p class="text-xs font-semibold text-slate-700 flex items-center gap-1 justify-end sm:justify-start">
                 <i data-lucide="phone" class="w-3 h-3 text-slate-400"></i>
                 ${escapeHTML(order.contact)}
               </p>
@@ -423,21 +423,21 @@
                 ${escapeHTML(formatFullAddress(order.address))}
               </p>
             </td>
-            <td class="py-4 px-4 min-w-[220px]">
+            <td class="py-4 px-4 min-w-[220px]" data-label="Items">
               ${renderItemsList(order.items)}
             </td>
-            <td class="py-4 px-4 whitespace-nowrap">
+            <td class="py-4 px-4 whitespace-nowrap" data-label="Subtotal">
               <span class="font-display font-extrabold text-base text-slate-900">
                 ${formatCurrency(order.subtotal)}
               </span>
             </td>
-            <td class="py-4 px-4 whitespace-nowrap">
+            <td class="py-4 px-4 whitespace-nowrap" data-label="Shipping">
               <p class="text-xs font-bold text-slate-800">${escapeHTML(order.shippingOption)}</p>
               <span class="inline-block mt-1 px-2 py-0.5 rounded-md text-[11px] font-semibold bg-cream-100 text-slate-700 border border-cream-200">
                 ${escapeHTML(order.shippingStatus)}
               </span>
             </td>
-            <td class="py-4 px-4 whitespace-nowrap">
+            <td class="py-4 px-4 whitespace-nowrap" data-label="Payment">
               <p class="text-xs font-bold text-slate-700 mb-1.5">${escapeHTML(order.paymentMethod)}</p>
               <button type="button" onclick="toggleInlinePaidStatus('${order.id}')"
                 title="Click to toggle Paid / Unpaid status"
@@ -452,7 +452,7 @@
               ${order.paymentReminder ? `<p class="text-[10px] font-bold text-amber-600 mt-1">${escapeHTML(order.paymentReminder)}</p>` : ''}
               ${order.notes ? `<p class="text-[10px] text-slate-400 mt-0.5 max-w-[140px] truncate" title="${escapeHTML(order.notes)}">📝 ${escapeHTML(order.notes)}</p>` : ''}
             </td>
-            <td class="py-4 px-4 whitespace-nowrap text-right">
+            <td class="py-4 px-4 whitespace-nowrap text-right" data-label="Actions">
               <div class="inline-flex items-center justify-end gap-1.5 flex-wrap">
                 <button type="button" onclick="openOrderModal('${order.id}')" title="Edit Entry"
                   class="btn-trendy p-2 rounded-xl bg-white text-slate-700 border border-slate-200 shadow-tactile hover:bg-cream-100">
@@ -469,7 +469,7 @@
                 </button>
                 <button type="button" onclick="openShipModal('${order.id}')"
                   class="btn-trendy inline-flex items-center gap-1 px-3 py-2 rounded-xl text-xs font-extrabold bg-amber-500 text-white shadow-tactile-amber hover:bg-amber-600">
-                  <span>Ship Order</span>
+                  <span>Ship</span>
                   <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
                 </button>
               </div>
@@ -490,17 +490,17 @@
           const grandTotal = (Number(order.subtotal) || 0) + (Number(order.shippingAmount) || 0);
           return `
             <tr class="hover:bg-amber-50/40 transition-colors align-top">
-              <td class="py-4 px-4 whitespace-nowrap">
+              <td class="py-4 px-4 whitespace-nowrap" data-label="Order #">
                 <span class="inline-flex items-center px-2.5 py-1 rounded-lg bg-amber-100 text-amber-800 font-mono font-extrabold text-xs border border-amber-200">
                   #${escapeHTML(order.orderNumber)}
                 </span>
               </td>
-              <td class="py-4 px-4 min-w-[200px] max-w-xs">
+              <td class="py-4 px-4 min-w-[200px] max-w-xs" data-label="Client">
                 <p class="font-bold text-slate-900">${escapeHTML(order.fullName)}</p>
                 <p class="text-xs text-slate-600 mt-0.5">${escapeHTML(order.contact)}</p>
                 <p class="text-xs text-slate-500 mt-1">${escapeHTML(formatFullAddress(order.address))}</p>
               </td>
-              <td class="py-4 px-4 min-w-[210px]">
+              <td class="py-4 px-4 min-w-[210px]" data-label="Items">
                 ${renderItemsList(order.items)}
                 <div class="mt-2 pt-1.5 border-t border-slate-100 text-xs space-y-0.5">
                   <div class="flex justify-between text-slate-500">
@@ -517,16 +517,16 @@
                   </div>
                 </div>
               </td>
-              <td class="py-4 px-4 whitespace-nowrap">
+              <td class="py-4 px-4 whitespace-nowrap" data-label="Shipped">
                 <p class="text-xs font-bold text-slate-800">${escapeHTML(order.shippedDate || '—')}</p>
                 <p class="text-xs text-slate-500 mt-0.5">${escapeHTML(order.shippingOption)}</p>
               </td>
-              <td class="py-4 px-4 min-w-[190px] max-w-xs">
+              <td class="py-4 px-4 min-w-[190px] max-w-xs" data-label="Tracking">
                 <div class="ship-details-box p-2.5 rounded-xl bg-amber-50/80 border border-amber-200/70 text-xs text-slate-700 leading-relaxed">
                   ${escapeHTML(order.shippingDetails || 'No tracking details')}
                 </div>
               </td>
-              <td class="py-4 px-4 whitespace-nowrap">
+              <td class="py-4 px-4 whitespace-nowrap" data-label="Payment">
                 <p class="text-xs font-bold text-slate-700 mb-1.5">${escapeHTML(order.paymentMethod)}</p>
                 <button type="button" onclick="toggleInlinePaidStatus('${order.id}')"
                   class="btn-trendy inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-extrabold border ${
@@ -538,7 +538,7 @@
                   <span>${order.isPaid ? 'Paid ✓' : 'Unpaid'}</span>
                 </button>
               </td>
-              <td class="py-4 px-4 whitespace-nowrap text-right">
+              <td class="py-4 px-4 whitespace-nowrap text-right" data-label="Actions">
                 <div class="inline-flex items-center justify-end gap-1.5 flex-wrap">
                   <button type="button" onclick="openOrderModal('${order.id}')" title="Edit Entry"
                     class="btn-trendy p-2 rounded-xl bg-white text-slate-700 border border-slate-200 shadow-tactile hover:bg-cream-100">
@@ -556,7 +556,7 @@
                   <button type="button" onclick="requestConfirmDelivered('${order.id}')"
                     class="btn-trendy inline-flex items-center gap-1 px-3 py-2 rounded-xl text-xs font-extrabold bg-sage-600 text-white shadow-tactile-sage hover:bg-sage-700">
                     <i data-lucide="check-circle" class="w-3.5 h-3.5"></i>
-                    <span>Confirm Delivered</span>
+                    <span>Delivered</span>
                   </button>
                 </div>
               </td>
@@ -577,42 +577,47 @@
           const grandTotal = (Number(order.subtotal) || 0) + (Number(order.shippingAmount) || 0);
           return `
             <tr class="hover:bg-sage-50/50 transition-colors align-top">
-              <td class="py-4 px-4 whitespace-nowrap">
+              <td class="py-4 px-4 whitespace-nowrap" data-label="Order #">
                 <span class="inline-flex items-center px-2.5 py-1 rounded-lg bg-sage-100 text-sage-700 font-mono font-extrabold text-xs border border-sage-200">
                   #${escapeHTML(order.orderNumber)}
                 </span>
               </td>
-              <td class="py-4 px-4 min-w-[180px]">
+              <td class="py-4 px-4 min-w-[180px]" data-label="Client">
                 <p class="font-bold text-slate-900">${escapeHTML(order.fullName)}</p>
-                <div class="flex flex-wrap gap-1 mt-1.5">
+                <div class="flex flex-wrap gap-1 mt-1.5 justify-end sm:justify-start">
                   ${renderSocMedBadges(order.socmeds)}
                 </div>
               </td>
-              <td class="py-4 px-4 min-w-[210px]">
+              <td class="py-4 px-4 min-w-[210px]" data-label="Items">
                 ${renderItemsList(order.items)}
               </td>
-              <td class="py-4 px-4 whitespace-nowrap">
+              <td class="py-4 px-4 whitespace-nowrap" data-label="Total">
                 <p class="font-display font-extrabold text-base text-slate-900">${formatCurrency(grandTotal)}</p>
                 <p class="text-[11px] text-slate-500">
                   ${escapeHTML(order.paymentMethod)} • ${order.isPaid ? '<span class="text-sage-700 font-bold">Paid ✓</span>' : '<span class="text-peach-600 font-bold">Unpaid</span>'}
                 </p>
               </td>
-              <td class="py-4 px-4 min-w-[180px] max-w-xs">
+              <td class="py-4 px-4 min-w-[180px] max-w-xs" data-label="Shipping">
                 <p class="text-xs font-bold text-slate-700">${escapeHTML(order.shippingOption)} (${formatCurrency(order.shippingAmount)})</p>
                 <p class="text-xs text-slate-500 mt-0.5 line-clamp-2">${escapeHTML(order.shippingDetails || '—')}</p>
               </td>
-              <td class="py-4 px-4 whitespace-nowrap">
+              <td class="py-4 px-4 whitespace-nowrap" data-label="Delivered">
                 <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-sage-100 text-sage-700">
                   <i data-lucide="calendar-check" class="w-3.5 h-3.5"></i>
                   ${escapeHTML(order.deliveredDate || order.shippedDate || 'Delivered')}
                 </span>
               </td>
-              <td class="py-4 px-4 whitespace-nowrap text-right">
+              <td class="py-4 px-4 whitespace-nowrap text-right" data-label="Actions">
                 <div class="inline-flex items-center justify-end gap-1.5">
                   <button type="button" onclick="openReceiptModal('${order.id}')"
                     class="btn-trendy inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-extrabold bg-lavender-600 text-white shadow-tactile-primary hover:bg-lavender-500">
                     <i data-lucide="eye" class="w-3.5 h-3.5"></i>
-                    <span>Show Order</span>
+                    <span>Show</span>
+                  </button>
+                  <button type="button" onclick="generateInvoice('${order.id}')" title="Generate Invoice"
+                    class="btn-trendy inline-flex items-center gap-1 px-3 py-2 rounded-xl text-xs font-extrabold bg-white text-lavender-700 border border-lavender-200 shadow-tactile hover:bg-lavender-50">
+                    <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+                    <span>Invoice</span>
                   </button>
                   <button type="button" onclick="requestDeleteOrder('${order.id}')" title="Delete Entry"
                     class="btn-trendy p-2 rounded-xl bg-white text-rose-600 border border-slate-200 shadow-tactile hover:bg-rose-50">
