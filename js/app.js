@@ -54,6 +54,7 @@
       updateUndoButton();
       renderTables();
       renderInventoryTable();
+      refreshMissingImages();
     }
 
     // Persist state immediately to localStorage and pulse the Auto-saved badge
@@ -106,6 +107,7 @@
       updateUndoButton();
       renderTables();
       renderInventoryTable();
+      refreshMissingImages();
       showToast(`Undid: ${previous.label}`, 'lavender');
     }
 
@@ -1093,6 +1095,7 @@
           closeOrderModal();
           renderTables();
           renderInventoryTable();
+          refreshMissingImages();
         }
       });
     }
@@ -1141,6 +1144,7 @@
           saveStateToStorage();
           renderTables();
           renderInventoryTable();
+          refreshMissingImages();
           showToast(
             willRestoreStock
               ? `Order #${order.orderNumber} deleted · stock restored.`
@@ -1474,14 +1478,18 @@
       const socmedList = (order.socmeds || []).length > 0
         ? order.socmeds.map(s => `${s.platform}: ${s.handle}`).join(' · ')
         : '—';
-      const itemsRows = (order.items || []).map(item => `
+      const itemsRows = (order.items || []).map(item => {
+        const src = getInventoryImageSrc(item.name);
+        const img = src ? `<img src="${src}" alt="" style="width:48px;height:48px;object-fit:cover;border-radius:8px;border:1px solid #eee;display:block;" />` : '';
+        return `
         <tr>
+          <td style="padding:8px 12px;border-bottom:1px solid #eee;width:64px;">${img}</td>
           <td style="padding:8px 12px;border-bottom:1px solid #eee;">${escapeHTML(item.name)}</td>
           <td style="padding:8px 12px;border-bottom:1px solid #eee;text-align:center;">${item.qty}</td>
           <td style="padding:8px 12px;border-bottom:1px solid #eee;text-align:right;">${formatCurrency(item.price)}</td>
           <td style="padding:8px 12px;border-bottom:1px solid #eee;text-align:right;font-weight:700;">${formatCurrency(item.qty * item.price)}</td>
-        </tr>
-      `).join('');
+        </tr>`;
+      }).join('');
 
       const textVersion = [
         `✨ ORDER INVOICE — babu's order tracker`,
@@ -1587,6 +1595,7 @@
         <table>
           <thead>
             <tr>
+              <th style="width:64px;"></th>
               <th>Item</th>
               <th style="text-align:center;">Qty</th>
               <th style="text-align:right;">Price</th>
@@ -1832,6 +1841,7 @@
               saveStateToStorage();
               renderTables();
               renderInventoryTable();
+              refreshMissingImages();
               showToast(`Imported ${parsedOrders.length} order(s) + ${parsedInventory.length} inventory item(s)!`, 'sage');
             }
           });
@@ -2190,6 +2200,108 @@
       });
     }
 
+    // Asset-folder images: looks for assets/{Item Name}.{ext}
+    const ASSET_IMAGE_EXTS = ['.jpg', '.jpeg', '.png', '.webp'];
+    // name (lowercase) -> resolved src or null
+    const inventoryImageCache = new Map();
+    let missingImageItems = [];
+
+    function assetImageCandidates(name) {
+      const base = String(name || '').trim();
+      if (!base) return [];
+      return ASSET_IMAGE_EXTS.map(ext => `assets/${encodeURIComponent(base)}${ext}`);
+    }
+
+    function probeImage(url) {
+      return new Promise(resolve => {
+        const img = new Image();
+        img.onload = () => resolve(true);
+        img.onerror = () => resolve(false);
+        img.src = url;
+      });
+    }
+
+    async function resolveInventoryImage(name) {
+      const key = String(name || '').trim().toLowerCase();
+      if (!key) return null;
+      if (inventoryImageCache.has(key)) return inventoryImageCache.get(key);
+      const candidates = assetImageCandidates(name);
+      for (const url of candidates) {
+        if (await probeImage(url)) {
+          inventoryImageCache.set(key, url);
+          return url;
+        }
+      }
+      inventoryImageCache.set(key, null);
+      return null;
+    }
+
+    function getInventoryImageSrc(name) {
+      const key = String(name || '').trim().toLowerCase();
+      return inventoryImageCache.get(key) || null;
+    }
+
+    async function refreshMissingImages() {
+      // Always re-probe so newly added asset files are picked up
+      inventoryImageCache.clear();
+      missingImageItems = [];
+      for (const item of inventory) {
+        const src = await resolveInventoryImage(item.name);
+        if (!src) {
+          missingImageItems.push({
+            name: item.name,
+            expected: assetImageCandidates(item.name)
+          });
+        }
+      }
+      renderMissingImagesBadge();
+      // Refresh table thumbnails if inventory modal is open
+      if (document.getElementById('inventoryModal') && !document.getElementById('inventoryModal').classList.contains('hidden')) {
+        renderInventoryTable();
+      }
+    }
+
+    function updateExpectedFilenameHint(name) {
+      const el = document.getElementById('invExpectedFilename');
+      if (!el) return;
+      const base = (name || '').trim() || 'Item Name';
+      el.textContent = `${base}.jpg`;
+    }
+
+    function renderMissingImagesBadge() {
+      const badge = document.getElementById('missingImagesBadge');
+      const countEl = document.getElementById('missingImagesCount');
+      const list = document.getElementById('missingImagesList');
+      if (!badge) return;
+      if (missingImageItems.length === 0) {
+        badge.classList.add('hidden');
+        document.getElementById('missingImagesPanel')?.classList.add('hidden');
+        return;
+      }
+      badge.classList.remove('hidden');
+      if (countEl) countEl.textContent = String(missingImageItems.length);
+      if (list) {
+        list.innerHTML = missingImageItems.map(m => `
+          <li class="flex flex-col gap-0.5 p-2 rounded-lg bg-amber-50 border border-amber-100">
+            <span class="font-bold text-slate-800">${escapeHTML(m.name)}</span>
+            <span class="font-mono text-[10px] text-slate-500 break-all">${escapeHTML(m.expected[0])}</span>
+          </li>
+        `).join('');
+      }
+    }
+
+    function toggleMissingImagesPanel() {
+      const panel = document.getElementById('missingImagesPanel');
+      if (!panel) return;
+      panel.classList.toggle('hidden');
+    }
+
+    // Holds the pending image (data URL) while adding/editing an inventory item — unused; images come from assets/
+    let pendingInventoryImage = '';
+
+    function previewInventoryImage(input) { /* legacy no-op */ }
+    function clearInventoryImage() { pendingInventoryImage = ''; }
+
     function resetInventoryForm() {
       document.getElementById('inventoryForm').reset();
       document.getElementById('editInventoryId').value = '';
@@ -2197,6 +2309,7 @@
       document.getElementById('invFieldPrice').value = '0';
       document.getElementById('invSubmitText').textContent = 'Add Item';
       document.getElementById('invCancelEditBtn').classList.add('hidden');
+      clearInventoryImage();
     }
 
     function renderInventoryTable() {
@@ -2232,6 +2345,14 @@
             : (item.stock <= 3 ? 'bg-amber-100 text-amber-700 border-amber-200' : 'bg-sage-100 text-sage-700 border-sage-200'));
         return `
           <tr class="hover:bg-lavender-50/40 transition-colors">
+            <td class="py-3 px-4">
+              ${(() => {
+                const src = getInventoryImageSrc(item.name);
+                return src
+                  ? `<img src="${src}" alt="" class="w-12 h-12 object-cover rounded-lg border border-slate-200 bg-white" />`
+                  : `<div class="w-12 h-12 rounded-lg bg-amber-50 border border-dashed border-amber-200 flex items-center justify-center text-amber-400" title="Missing: assets/${escapeHTML(item.name)}.jpg"><i data-lucide="image-off" class="w-4 h-4"></i></div>`;
+              })()}
+            </td>
             <td class="py-3 px-4">
               <p class="font-bold text-slate-900">${escapeHTML(item.name)}</p>
             </td>
@@ -2291,6 +2412,10 @@
         pushHistory(`Edit inventory: ${name}`);
         const idx = inventory.findIndex(i => i.id === editId);
         if (idx !== -1) {
+          // If name changed, clear cached image so we re-probe
+          if (inventory[idx].name.toLowerCase() !== name.toLowerCase()) {
+            inventoryImageCache.delete(inventory[idx].name.toLowerCase());
+          }
           inventory[idx] = { ...inventory[idx], name, stock, price, type };
         }
         showToast(`Updated "${name}" in inventory.`, 'sage');
@@ -2310,6 +2435,7 @@
       saveStateToStorage();
       resetInventoryForm();
       renderInventoryTable();
+      refreshMissingImages();
     }
 
     function editInventoryItem(id) {
@@ -2321,6 +2447,7 @@
       document.getElementById('invFieldPrice').value = Number(item.price).toFixed(2);
       const typeEl = document.getElementById('invFieldType');
       if (typeEl) typeEl.value = item.type || 'merch';
+      updateExpectedFilenameHint(item.name);
       document.getElementById('invSubmitText').textContent = 'Save Changes';
       document.getElementById('invCancelEditBtn').classList.remove('hidden');
       document.getElementById('invFieldName').focus();
@@ -2340,6 +2467,7 @@
           inventory = inventory.filter(i => i.id !== id);
           saveStateToStorage();
           renderInventoryTable();
+          refreshMissingImages();
           showToast(`Removed "${item.name}" from inventory.`, 'peach');
         }
       });
@@ -2433,5 +2561,9 @@
     window.addEventListener('DOMContentLoaded', () => {
       initDarkMode();
       loadState();
+      const nameInput = document.getElementById('invFieldName');
+      if (nameInput) {
+        nameInput.addEventListener('input', () => updateExpectedFilenameHint(nameInput.value));
+      }
       lucide.createIcons();
     });

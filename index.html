@@ -171,6 +171,15 @@
             <span class="toolbar-label" id="darkModeLabel">Dark</span>
           </button>
 
+          <!-- Missing asset images reminder -->
+          <button type="button" id="missingImagesBadge" onclick="toggleMissingImagesPanel()"
+            class="hidden relative btn-trendy inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300 shadow-tactile hover:bg-amber-200 max-w-[220px] sm:max-w-none"
+            title="Remind babu to add these images on the asset folder!">
+            <i data-lucide="image-off" class="w-4 h-4 shrink-0"></i>
+            <span id="missingImagesLabel" class="truncate">Remind babu to add these images on the asset folder!</span>
+            <span id="missingImagesCount" class="shrink-0 px-1.5 py-0.5 rounded-md bg-amber-200 text-amber-900">0</span>
+          </button>
+
           <!-- Primary + Add Entry Button (desktop / tablet) -->
           <button onclick="openOrderModal()"
             class="btn-trendy hidden sm:inline-flex items-center gap-1.5 px-4 sm:px-5 py-2 rounded-xl text-xs sm:text-sm font-extrabold bg-lavender-600 text-white shadow-tactile-primary hover:bg-lavender-500">
@@ -921,6 +930,14 @@
               Cancel
             </button>
           </div>
+          <div class="sm:col-span-12">
+            <p class="text-xs text-slate-500">
+              Images live in <code class="px-1 py-0.5 rounded bg-cream-100 text-slate-700">assets/</code>.
+              Name the file exactly as the item name plus an extension
+              (e.g. <code class="px-1 py-0.5 rounded bg-cream-100 text-slate-700" id="invExpectedFilename">Item Name.jpg</code>).
+              Supported: .jpg, .jpeg, .png, .webp
+            </p>
+          </div>
         </form>
       </div>
 
@@ -930,6 +947,7 @@
           <table class="w-full text-left border-collapse">
             <thead>
               <tr class="bg-cream-50/90 border-b border-slate-200/80 text-[11px] font-bold uppercase tracking-wider text-slate-500">
+                <th class="py-3 px-4">Image</th>
                 <th class="py-3 px-4">Item Name</th>
                 <th class="py-3 px-4 text-center">Type</th>
                 <th class="py-3 px-4 text-center">Stock</th>
@@ -968,6 +986,16 @@
 
   <!-- Toast Notification Container -->
   <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- Missing images reminder panel -->
+  <div id="missingImagesPanel" class="hidden fixed top-20 right-4 z-40 w-80 max-w-[calc(100vw-2rem)] glass-card rounded-2xl shadow-lg border border-amber-200 p-4">
+    <div class="flex items-start justify-between gap-2 mb-2">
+      <p class="text-sm font-extrabold text-amber-800 leading-snug">Remind babu to add these images on the asset folder!</p>
+      <button type="button" onclick="toggleMissingImagesPanel()" class="text-slate-400 hover:text-slate-700 text-lg leading-none">&times;</button>
+    </div>
+    <p class="text-[11px] text-slate-500 mb-2">Drop the file into <code>assets/</code> with the exact name below:</p>
+    <ul id="missingImagesList" class="text-xs space-y-1.5 max-h-60 overflow-y-auto"></ul>
+  </div>
 
   <!-- Mobile-only floating Add button (hidden from sm breakpoint up) -->
   <button type="button" onclick="openOrderModal()" class="fab-add sm:hidden" title="Add new order">
