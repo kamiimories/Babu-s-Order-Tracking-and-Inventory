@@ -1480,11 +1480,17 @@
         : '—';
       const itemsRows = (order.items || []).map(item => {
         const src = getInventoryImageSrc(item.name);
-        const img = src ? `<img src="${src}" alt="" style="width:48px;height:48px;object-fit:cover;border-radius:8px;border:1px solid #eee;display:block;" />` : '';
+        const img = src
+          ? `<img src="${src}" alt="" style="width:48px;height:48px;object-fit:cover;border-radius:8px;border:1px solid #eee;flex-shrink:0;" />`
+          : '';
         return `
         <tr>
-          <td style="padding:8px 12px;border-bottom:1px solid #eee;width:64px;">${img}</td>
-          <td style="padding:8px 12px;border-bottom:1px solid #eee;">${escapeHTML(item.name)}</td>
+          <td style="padding:8px 12px;border-bottom:1px solid #eee;">
+            <div style="display:flex;align-items:center;gap:10px;">
+              ${img}
+              <span style="font-weight:600;">${escapeHTML(item.name)}</span>
+            </div>
+          </td>
           <td style="padding:8px 12px;border-bottom:1px solid #eee;text-align:center;">${item.qty}</td>
           <td style="padding:8px 12px;border-bottom:1px solid #eee;text-align:right;">${formatCurrency(item.price)}</td>
           <td style="padding:8px 12px;border-bottom:1px solid #eee;text-align:right;font-weight:700;">${formatCurrency(item.qty * item.price)}</td>
@@ -1595,7 +1601,6 @@
         <table>
           <thead>
             <tr>
-              <th style="width:64px;"></th>
               <th>Item</th>
               <th style="text-align:center;">Qty</th>
               <th style="text-align:right;">Price</th>
@@ -2209,7 +2214,10 @@
     function assetImageCandidates(name) {
       const base = String(name || '').trim();
       if (!base) return [];
-      return ASSET_IMAGE_EXTS.map(ext => `assets/${encodeURIComponent(base)}${ext}`);
+      return ASSET_IMAGE_EXTS.map(ext => ({
+        display: `assets/${base}${ext}`,
+        url: `assets/${encodeURIComponent(base)}${ext}`
+      }));
     }
 
     function probeImage(url) {
@@ -2226,10 +2234,10 @@
       if (!key) return null;
       if (inventoryImageCache.has(key)) return inventoryImageCache.get(key);
       const candidates = assetImageCandidates(name);
-      for (const url of candidates) {
-        if (await probeImage(url)) {
-          inventoryImageCache.set(key, url);
-          return url;
+      for (const cand of candidates) {
+        if (await probeImage(cand.url)) {
+          inventoryImageCache.set(key, cand.url);
+          return cand.url;
         }
       }
       inventoryImageCache.set(key, null);
@@ -2284,7 +2292,7 @@
         list.innerHTML = missingImageItems.map(m => `
           <li class="flex flex-col gap-0.5 p-2 rounded-lg bg-amber-50 border border-amber-100">
             <span class="font-bold text-slate-800">${escapeHTML(m.name)}</span>
-            <span class="font-mono text-[10px] text-slate-500 break-all">${escapeHTML(m.expected[0])}</span>
+            <span class="font-mono text-[10px] text-slate-500 break-all">${escapeHTML(m.expected[0].display)}</span>
           </li>
         `).join('');
       }
