@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>babu's order tracker — Artist Studio & Commission Manager</title>
+  <title>babu's order tracker v1.9 — Artist Studio & Commission Manager</title>
 
   <!-- Tailwind CSS (Play CDN — fine for local single-file tools) -->
   <script>
@@ -108,6 +108,9 @@
                 <h1 class="font-display font-extrabold text-2xl tracking-tight text-slate-900">
                   babu's order tracker
                 </h1>
+                <span class="px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider rounded-full bg-lavender-100 text-lavender-700 border border-lavender-200">
+                  v1.9
+                </span>
                 <span class="px-2.5 py-0.5 text-[11px] font-bold uppercase tracking-wider rounded-full bg-peach-100 text-peach-600 border border-peach-200">
                   artist studio
                 </span>
@@ -715,6 +718,11 @@
               <input type="text" id="fieldEditShippingDetails"
                 class="w-full px-3 py-2 rounded-xl bg-white border border-amber-200 text-sm" />
             </div>
+            <div class="sm:col-span-2">
+              <label class="block text-xs font-semibold text-slate-600 mb-1">Tracking Link</label>
+              <input type="url" id="fieldEditShippingLink" placeholder="https://..."
+                class="w-full px-3 py-2 rounded-xl bg-white border border-amber-200 text-sm" />
+            </div>
           </div>
         </div>
 
@@ -777,8 +785,16 @@
           <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">
             Shipping Details (Courier, Tracking #, Notes) <span class="text-peach-600">*</span>
           </label>
-          <textarea id="shipDetailsInput" rows="3" required placeholder="e.g., J&T Waybill #7849201928 — Fragile art print mailer"
+          <textarea id="shipDetailsInput" rows="3" required placeholder="e.g., JT0023585256965"
             class="w-full px-3.5 py-2.5 rounded-xl bg-cream-50 border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/40"></textarea>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">
+            Tracking Link
+          </label>
+          <input type="url" id="shipLinkInput" placeholder="https://www.jtexpress.ph/track-and-trace"
+            class="w-full px-3.5 py-2.5 rounded-xl bg-cream-50 border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/40" />
         </div>
 
         <div class="pt-2 flex items-center justify-end gap-2.5">

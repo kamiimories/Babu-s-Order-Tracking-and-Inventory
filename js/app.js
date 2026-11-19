@@ -705,6 +705,8 @@
           document.getElementById('fieldEditShippingAmount').value = order.shippingAmount || 0;
           document.getElementById('fieldEditShippedDate').value = order.shippedDate || '';
           document.getElementById('fieldEditShippingDetails').value = order.shippingDetails || '';
+          const linkEl = document.getElementById('fieldEditShippingLink');
+          if (linkEl) linkEl.value = order.shippingLink || '';
         } else {
           extraShippingSec.classList.add('hidden');
         }
@@ -1055,6 +1057,7 @@
                 updated.shippingAmount = parseFloat(document.getElementById('fieldEditShippingAmount').value) || 0;
                 updated.shippedDate = document.getElementById('fieldEditShippedDate').value;
                 updated.shippingDetails = document.getElementById('fieldEditShippingDetails').value.trim();
+                updated.shippingLink = document.getElementById('fieldEditShippingLink').value.trim();
               }
 
               orders[idx] = updated;
@@ -1187,6 +1190,7 @@
       document.getElementById('shipAmountInput').value = order.shippingAmount || '';
       document.getElementById('shipDateInput').value = order.shippedDate || getTodayDateStr();
       document.getElementById('shipDetailsInput').value = order.shippingDetails || `${order.shippingOption} — `;
+      document.getElementById('shipLinkInput').value = order.shippingLink || '';
 
       const modal = document.getElementById('shipModal');
       modal.classList.remove('hidden');
@@ -1209,6 +1213,7 @@
       const shippingAmount = parseFloat(document.getElementById('shipAmountInput').value) || 0;
       const shippedDate = document.getElementById('shipDateInput').value;
       const shippingDetails = document.getElementById('shipDetailsInput').value.trim();
+      const shippingLink = document.getElementById('shipLinkInput').value.trim();
 
       pushHistory(`Ship Order #${orders[idx].orderNumber}`);
       orders[idx] = {
@@ -1217,7 +1222,8 @@
         shippingStatus: 'In Transit',
         shippingAmount,
         shippedDate,
-        shippingDetails
+        shippingDetails,
+        shippingLink
       };
 
       saveStateToStorage();
@@ -1497,29 +1503,47 @@
         </tr>`;
       }).join('');
 
-      const textVersion = [
-        `✨ ORDER INVOICE — babu's order tracker`,
-        `Order #${order.orderNumber}`,
-        ``,
-        `Client: ${order.fullName}`,
-        `Contact: ${order.contact}`,
-        `SocMeds: ${socmedList}`,
-        `Address: ${formatFullAddress(order.address)}`,
-        ``,
-        `--- ITEMS ---`,
-        ...(order.items || []).map(i => `• ${i.qty}x ${i.name} @ ${formatCurrency(i.price)} = ${formatCurrency(i.qty * i.price)}`),
-        ``,
-        `Subtotal: ${formatCurrency(order.subtotal)}`,
-        `Shipping (${order.shippingOption}): ${formatCurrency(order.shippingAmount)}`,
-        `GRAND TOTAL: ${formatCurrency(grandTotal)}`,
-        ``,
-        `Payment: ${order.paymentMethod} (${order.isPaid ? 'Paid ✓' : 'Unpaid'})`,
-        `Shipped: ${order.shippedDate || '—'}`,
-        `Delivered: ${order.deliveredDate || '—'}`,
-        `Tracking: ${order.shippingDetails || '—'}`,
-        ``,
-        `Thank you for your order! 💖`
-      ].join('\n');
+      const isShippingInvoice = order.stage === 'shipping';
+
+      const textVersion = isShippingInvoice
+        ? [
+            `Hallo!!`,
+            `Thank you so much for your support!`,
+            ``,
+            `Your order was shipped via ${order.shippingOption || 'courier'} with the tracking number`,
+            `${order.shippingDetails || '—'}`,
+            ...(order.shippingLink ? [
+              `You can track your package using this link`,
+              order.shippingLink
+            ] : []),
+            `Once you receive the items, please do let me know!`,
+            ``,
+            `Hope to see you again soon! Have a great day!`,
+            `-Kamii`
+          ].join('\n')
+        : [
+            `✨ ORDER INVOICE — babu's order tracker`,
+            `Order #${order.orderNumber}`,
+            ``,
+            `Client: ${order.fullName}`,
+            `Contact: ${order.contact}`,
+            `SocMeds: ${socmedList}`,
+            `Address: ${formatFullAddress(order.address)}`,
+            ``,
+            `--- ITEMS ---`,
+            ...(order.items || []).map(i => `• ${i.qty}x ${i.name} @ ${formatCurrency(i.price)} = ${formatCurrency(i.qty * i.price)}`),
+            ``,
+            `Subtotal: ${formatCurrency(order.subtotal)}`,
+            `Shipping (${order.shippingOption}): ${formatCurrency(order.shippingAmount)}`,
+            `GRAND TOTAL: ${formatCurrency(grandTotal)}`,
+            ``,
+            `Payment: ${order.paymentMethod} (${order.isPaid ? 'Paid ✓' : 'Unpaid'})`,
+            `Shipped: ${order.shippedDate || '—'}`,
+            `Delivered: ${order.deliveredDate || '—'}`,
+            `Tracking: ${order.shippingDetails || '—'}`,
+            ``,
+            `Thank you for your order! 💖`
+          ].join('\n');
 
       const win = window.open('', '_blank', 'width=720,height=900');
       if (!win) {
@@ -1561,7 +1585,12 @@
     .toolbar button.secondary { background: #475569; }
     .toolbar button.accent { background: #27684b; }
     .toolbar-tip { font-size: 0.75rem; color: #cbd5e1; text-align: center; max-width: 520px; line-height: 1.4; }
-    .toolbar-tip strong { color: #fde68a; }
+    .thankyou-msg h2 { color: #3d7a3a; font-size: 1.35rem; margin: 0 0 4px; }
+    .thankyou-msg h3 { color: #3d7a3a; font-size: 1.15rem; margin: 0 0 16px; }
+    .thankyou-msg p { margin: 6px 0; font-size: 0.95rem; line-height: 1.45; }
+    .thankyou-msg .track { color: #c0392b; font-weight: 700; }
+    .thankyou-msg a { color: #1a73e8; }
+    .duck-slot { text-align: center; padding: 16px 0 8px; min-height: 40px; }
     @media print {
       .toolbar { display: none !important; }
       body { background: #fff; }
@@ -1582,9 +1611,27 @@
     </p>
   </div>
   <div class="page">
-    <img class="banner" src="${INVOICE_BANNER_TOP}" alt="Order Request" />
+    ${isShippingInvoice
+      ? `<img class="banner" src="${INVOICE_THANKYOU}" alt="Thank you" />`
+      : `<img class="banner" src="${INVOICE_BANNER_TOP}" alt="Order Request" />`}
 
     <div class="content">
+      ${isShippingInvoice ? `
+      <div class="duck-slot"><!-- duck image will go here later --></div>
+      <div class="thankyou-msg">
+        <h2>Hallo!!</h2>
+        <h3>Thank you so much for your support!</h3>
+        <p>Your order was shipped via ${escapeHTML(order.shippingOption || 'courier')} with the tracking number</p>
+        <p class="track">${escapeHTML(order.shippingDetails || '—')}</p>
+        ${order.shippingLink ? `
+        <p>You can track your package using this link</p>
+        <p><a href="${escapeHTML(order.shippingLink)}" target="_blank">${escapeHTML(order.shippingLink)}</a></p>
+        ` : ''}
+        <p>Once you receive the items, please do let me know!</p>
+        <p style="margin-top:14px;">Hope to see you again soon! Have a great day!</p>
+        <p>-Kamii</p>
+      </div>
+      ` : `
       <h1>Order Invoice</h1>
       <p class="order-num">#${escapeHTML(order.orderNumber)}</p>
 
@@ -1651,9 +1698,10 @@
         <p class="pay-note">Transfer fees may apply · Use any of the QR codes above</p>
       </div>
       `}
+      `}
     </div>
 
-    <img class="banner" src="${INVOICE_THANKYOU}" alt="Thank you" />
+    ${isShippingInvoice ? '' : `<img class="banner" src="${INVOICE_THANKYOU}" alt="Thank you" />`}
   </div>
 
   <script>
