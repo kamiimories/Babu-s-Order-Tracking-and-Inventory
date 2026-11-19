@@ -1563,6 +1563,8 @@
     .page { max-width: 640px; margin: 0 auto; background: #fff; min-height: 100vh; }
     .banner { width: 100%; display: block; }
     .content { padding: 24px 28px; }
+    .content-tight { padding: 0 28px 24px; margin-top: -24px; }
+    .shipping-banner { width: 100%; display: block; margin: 0; }
     h1 { font-size: 1.35rem; font-weight: 800; margin-bottom: 4px; }
     .order-num { font-family: ui-monospace, monospace; font-weight: 700; color: #5a46c7; font-size: 0.95rem; margin-bottom: 16px; }
     .card { background: #fdfbf7; border: 1px solid #efe8d8; border-radius: 12px; padding: 14px 16px; margin-bottom: 16px; }
@@ -1612,12 +1614,11 @@
   </div>
   <div class="page">
     ${isShippingInvoice
-      ? `<img class="banner" src="${INVOICE_THANKYOU}" alt="Thank you" />`
+      ? `<img class="shipping-banner" src="${INVOICE_THANKYOU}" alt="Thank you" />`
       : `<img class="banner" src="${INVOICE_BANNER_TOP}" alt="Order Request" />`}
 
-    <div class="content">
+    <div class="content${isShippingInvoice ? ' content-tight' : ''}">
       ${isShippingInvoice ? `
-      <div class="duck-slot"><!-- duck image will go here later --></div>
       <div class="thankyou-msg">
         <h2>Hallo!!</h2>
         <h3>Thank you so much for your support!</h3>
